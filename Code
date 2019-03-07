@@ -1,0 +1,79 @@
+### Decison Tree and Random Forest
+import pandas as pd
+import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
+
+#Data
+loans = pd.read_csv('C:\\Users\\Kieu\\Python-Data-Science-and-Machine-Learning-Bootcamp\\Python-Data-Science-and-Machine-Learning-Bootcamp\\Machine Learning Sections\\Decision-Trees-and-Random-Forests\\loan_data.csv')
+
+loans.info()
+
+loans.describe()
+
+loans.head()
+
+#Data Analysis
+plt.figure(figsize=(10,6))
+loans[loans['credit.policy']==1]['fico'].hist(alpha=.5,color='blue',bins=30,label='credit.policy=1')
+loans[loans['credit.policy']==0]['fico'].hist(alpha=.5,color='red',bins=30,label='credit.policy=0')
+    
+plt.legend()
+plt.xlabel('FICO')  
+
+plt.figure(figsize=(11,7))
+sns.countplot(x='purpose',hue='not.fully.paid',data=loans,palette='Set1')
+
+sns.jointplot(x='fico',y='int.rate',data=loans,color='purple')
+
+plt.figure(figsize=(11,7))
+sns.lmplot(y='int.rate',x='fico',data=loans,hue='credit.policy',
+           col='not.fully.paid',palette='Set1')
+
+loans.info()
+
+cat_feats = ['purpose']
+
+final_data = pd.get_dummies(loans,columns=cat_feats,drop_first=True)
+
+final_data.info()
+
+cat_feats = ['purpose']
+
+final_data = pd.get_dummies(loans,columns=cat_feats,drop_first=True)
+
+final_data.info()
+
+#Training Model
+from sklearn.model_selection import train_test_split
+
+x = final_data.drop('not.fully.paid')
+y = final_data['not.fully.paid']
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=6,)
+
+#Data Modeling
+from sklearn.tree import DecisionTreeClassifier 
+
+dtre = DecisionTreeClassifier()
+
+dtre.fix(x_train,y_train)
+
+#Prediction
+pred_dec = dtre.predict(x_test)
+
+from sklearn.metrics import classification_report,confusion_matrix
+
+print(classification_report(y_test,predictions))
+
+print(confusion_matrix(y_test,predictions))
+
+from sklearn.ensemble import RandomForestClassifier
+rfc = RandomForestClassifier(n_estimators=100)
+rfc.fit(x_train,y_train)
+
+rfc_pred = rfc.predict(x_test)
+
+#Conclusion
+print(confusion_matrix(y_test,rfc_pred))
+
+print(classification_report(y_test,rfc_pred))
